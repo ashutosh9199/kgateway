@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flower-deployment
+  namespace: ashutosh-ns
+  labels:
+    app: flower
+spec:
+  replicas: 3
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailabel: 25%
+      maxSurge: 25%
+
+  selector:
+    matchLabels:
+      app: flower
+      
+  template:
+    metadata:
+      labels:
+        app: flower
+
+    spec:
+      containers:
+        - name: flower-container
+          image: muralisocial123/flower-app:v1.1.0
+          ports:
+          - containerPort: 3015
+
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flower-service
+  namespace: ashutosh-ns
+spec:
+  selector:
+    app: flower
+  ports:
+    - protocol: TCP
+      port: 3015
+      targetPort: 3015

@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ey-cart-deployment
+  namespace: ashutosh-ns
+  labels:
+    app: ey-cart
+
+spec:
+  replicas: 3
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailabel: 25%
+      maxSurge: 25%
+
+  selector:
+    matchLabels:
+      app: ey-cart
+  template:
+    metadata:
+      labels:
+        app: ey-cart
+    spec:
+      containers:
+        - name: ey-cart-container
+          image: muralisocial123/ey-cart-app:v1.1.0
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ey-cart-service
+  namespace: ashutosh-ns
+spec:
+  selector:
+    app: ey-cart
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: ClusterIP
